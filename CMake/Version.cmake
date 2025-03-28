@@ -219,7 +219,7 @@ else()
         cmake_policy(SET CMP0115 NEW)
     endif()
 
-    install(FILES ${VERSION_H} DESTINATION include)
+    set_target_properties(cmakeVersion PROPERTIES PUBLIC_HEADER ${VERSION_H})
     add_dependencies( cmakeVersion 
         INTERFACE genCmakeVersion )
         

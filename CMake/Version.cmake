@@ -209,8 +209,11 @@ else()
     )
 
     add_library( cmakeVersion INTERFACE )
-    target_include_directories(cmakeVersion INTERFACE "${VERSION_OUT_DIR}")
-
+    target_include_directories(cmakeVersion INTERFACE
+	    $<BUILD_INTERFACE:${VERSION_OUT_DIR}>
+	    $<INSTALL_INTERFACE:include>
+    )
+    
     # @note Explicit file-names - prevent Cmake finding `Version.h.in` for `Version.h`
     if (POLICY CMP0115)
         cmake_policy(SET CMP0115 NEW)

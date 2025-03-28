@@ -14,7 +14,10 @@ list(APPEND CMAKE_MESSAGE_INDENT "  ")
 
 set(VERSION_OUT_DIR "${CMAKE_BINARY_DIR}" CACHE PATH "Destination directory into which `Version.cmake` shall genrate Versioning header files")
 set(VERSION_SOURCE_DIR "${CMAKE_SOURCE_DIR}" CACHE PATH "Repositroy directory used for `Version.cmake` repo versioning")
-set(VERSION_PREFIX "" CACHE STRING "Prefix for generated files and definitions")
+
+if(NOT VERSION_PREFIX)
+	set(VERSION_PREFIX "" CACHE STRING "Prefix for generated files and definitions")
+endif()
 
 # Get cmakeVersion information
 message(CHECK_START "Find git")

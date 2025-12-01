@@ -15,17 +15,17 @@ Simplify your Semantic-Version automation within every developer build using cod
    <br/> :gem: Instead of `BUILD_TESTING` use `MYLIBRARY_BUILD_TESTING`
 
 ## Output Variables
-All variables use the form `VERSION_<field>`
+All variables use the form `<VERSION_PREFIX>_VERSION_<field>`
 
 Values are defined similar both `CMake` and via the default `Version.h` using C-Preprocessor:or:
-- `VERSION_SET` - Boolean indicating if `VERSION_<fields>` have been populated
-- `VERSION_MAJOR` - Major semantic-version extracted from repository tag
-- `VERSION_MINOR` - Minor semantic-version extracted from repository tag
-- `VERSION_PATCH` - Patch semantic-version extracted from repository tag
-- `VERSION_COMMIT` - Commit-count semantic-version extracted from repository branch revision
-- `VERSION_SHA` - Revision specific unique SHA hash. For example `4c757e7`
-- `VERSION_SEMANTIC` - Full semantic version in form `<major>.<minor>.<patch>.<commit>`. For example `0.1.0.10`
-- `VERSION_FULL` - Full string description, useful for ABI compatiblity. For example `v0.1-9-g4c757e7-dirty`
+- `<VERSION_PREFIX>_VERSION_SET` - Boolean indicating if `VERSION_<fields>` have been populated
+- `<VERSION_PREFIX>_VERSION_MAJOR` - Major semantic-version extracted from repository tag
+- `<VERSION_PREFIX>_VERSION_MINOR` - Minor semantic-version extracted from repository tag
+- `<VERSION_PREFIX>_VERSION_PATCH` - Patch semantic-version extracted from repository tag
+- `<VERSION_PREFIX>_VERSION_COMMIT` - Commit-count semantic-version extracted from repository branch revision
+- `<VERSION_PREFIX>_VERSION_SHA` - Revision specific unique SHA hash. For example `4c757e7`
+- `<VERSION_PREFIX>_VERSION_SEMANTIC` - Full semantic version in form `<major>.<minor>.<patch>.<commit>`. For example `0.1.0.10`
+- `<VERSION_PREFIX>_VERSION_FULL` - Full string description, useful for ABI compatiblity. For example `v0.1-9-g4c757e7-dirty`
 
 ## Adding Version.cmake
 
@@ -60,11 +60,11 @@ To use the Version information within a cmake build target:
 ```cmake
 target_link_libraries( MyLibrary
     PRIVATE
-        version::version
+        <VERSION_PREFIX>_cmakeVersion
 )
 ```
 ```cpp
-#include "Version.h"
+#include "<VERSION_PREFIX>Version.h"
 ```
 
 # Advantages

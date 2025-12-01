@@ -125,7 +125,12 @@ if(NOT _GIT_RESULT EQUAL 0)
                        "OUTPUT_VARIABLE:'${_GIT_CACHE_PATH}'\n"
                        "ERROR_VARIABLE:'${_GIT_ERROR}'")
 else()
-    file(TO_CMAKE_PATH "${VERSION_SOURCE_DIR}/${_GIT_CACHE_PATH}" _GIT_CACHE_PATH)
+    if(IS_ABSOLUTE "${_GIT_CACHE_PATH}")
+        file(TO_CMAKE_PATH "${_GIT_CACHE_PATH}" _GIT_CACHE_PATH)
+    else()
+        file(TO_CMAKE_PATH "${VERSION_SOURCE_DIR}/${_GIT_CACHE_PATH}" _GIT_CACHE_PATH)
+    endif()
+
     message(CHECK_PASS "Success '${_GIT_CACHE_PATH}'")
 endif()
 

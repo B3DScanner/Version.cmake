@@ -5,12 +5,10 @@ cmake_minimum_required(VERSION 3.20)
 message(CHECK_START "Version.cmake")
 list(APPEND CMAKE_MESSAGE_INDENT "  ")
 
-# Prefix dla exportowanych zmiennych i targetów
 if(NOT DEFINED VERSION_PREFIX)
     set(VERSION_PREFIX "" CACHE STRING "Prefix for generated version variables and targets")
 endif()
 
-# Nazwy targetów zależne od prefixu
 if(VERSION_PREFIX STREQUAL "")
     set(_VERSION_TARGET_GEN   "genCmakeVersion")
     set(_VERSION_TARGET_IFACE "cmakeVersion")
@@ -21,7 +19,6 @@ else()
     set(_VERSION_ALIAS        "${VERSION_PREFIX}::version")
 endif()
 
-# Gdzie generujemy nagłówek (możesz nadpisać przed include)
 if(VERSION_PREFIX STREQUAL "")
     set(_OUT_DIR_VAR    "VERSION_OUT_DIR")
     set(_SRC_DIR_VAR    "VERSION_SOURCE_DIR")
@@ -30,24 +27,20 @@ else()
     set(_SRC_DIR_VAR    "${VERSION_PREFIX}_VERSION_SOURCE_DIR")
 endif()
 
-# Gdzie generujemy nagłówek
 if(NOT DEFINED ${_OUT_DIR_VAR})
     set(${_OUT_DIR_VAR} "${CMAKE_BINARY_DIR}" CACHE PATH
         "Destination directory into which Version.cmake shall generate ${VERSION_PREFIX}Version.h")
 endif()
 
-# Skąd bierzemy repo (domyślnie root projektu)
 if(NOT DEFINED ${_SRC_DIR_VAR})
     set(${_SRC_DIR_VAR} "${CMAKE_CURRENT_SOURCE_DIR}" CACHE PATH
         "Repository directory used for Version.cmake repo versioning (${VERSION_PREFIX})")
 endif()
 
-# Lokalne „skrótowe” zmienne używane w reszcie skryptu
 set(VERSION_OUT_DIR    "${${_OUT_DIR_VAR}}")
 set(VERSION_SOURCE_DIR "${${_SRC_DIR_VAR}}")
 
 # ---------- Git ----------
-
 message(CHECK_START "Find git")
 if(NOT DEFINED GIT_EXECUTABLE)
     find_package(Git)
@@ -60,7 +53,6 @@ else()
     message(CHECK_PASS "Using pre-defined GIT_EXECUTABLE: '${GIT_EXECUTABLE}'")
 endif()
 
-# describe: np. v1.0.0-1-g23fe208-dirty
 set(_GIT_VERSION_COMMAND
     "${GIT_EXECUTABLE}" -C "${VERSION_SOURCE_DIR}"
     --no-pager describe --tags
@@ -68,18 +60,14 @@ set(_GIT_VERSION_COMMAND
     --always --dirty --long
 )
 
-# count commitów
 set(_GIT_COUNT_COMMAND
     "${GIT_EXECUTABLE}" -C "${VERSION_SOURCE_DIR}"
     rev-list --count --first-parent HEAD
 )
 
-# git dir
 set(_GIT_CACHE_PATH_COMMAND
     "${GIT_EXECUTABLE}" -C "${VERSION_SOURCE_DIR}" rev-parse --git-dir
 )
-
-# ---------- Parsowanie semver ----------
 
 macro(version_parseSemantic semVer)
     if("${semVer}" MATCHES "^v?([0-9]+)[._]([0-9]+)[._]?([0-9]+)?[-]([0-9]+)[-][g]([._0-9A-Fa-f]+)[-]?(dirty)?$")
@@ -103,7 +91,6 @@ macro(version_parseSemantic semVer)
     endif()
 endmacro()
 
-# Export do zmiennych z prefixem, np. TE_VERSION_FULL, TE_VERSION_SEMANTIC
 macro(version_export_variables)
     if(NOT DEFINED VERSION_PREFIX OR VERSION_PREFIX STREQUAL "")
         set(_NS "")
@@ -111,7 +98,6 @@ macro(version_export_variables)
         set(_NS "${VERSION_PREFIX}_")
     endif()
 
-    # _VERSION_* to wewnętrzne zmienne z version_parseSemantic()
     set(${_NS}VERSION_SET      ${_VERSION_SET}      CACHE INTERNAL "" FORCE)
     set(${_NS}VERSION_MAJOR    ${_VERSION_MAJOR}    CACHE INTERNAL "" FORCE)
     set(${_NS}VERSION_MINOR    ${_VERSION_MINOR}    CACHE INTERNAL "" FORCE)
@@ -124,7 +110,6 @@ macro(version_export_variables)
 endmacro()
 
 # ---------- Git cache path ----------
-
 message(CHECK_START "Git Cache-Path")
 execute_process(
     COMMAND           ${_GIT_CACHE_PATH_COMMAND}
@@ -145,7 +130,6 @@ else()
 endif()
 
 # ---------- Git describe ----------
-
 message(CHECK_START "Git Describe")
 execute_process(
     COMMAND           ${_GIT_VERSION_COMMAND}
@@ -173,7 +157,6 @@ else()
 endif()
 
 # ---------- Fallback na git count ----------
-
 if(NOT DEFINED _VERSION_FULL AND NOT _VERSION_NOT_GIT_REPO)
     message(CHECK_START "Fallback as Git-Count")
     execute_process(
@@ -198,19 +181,15 @@ if(NOT DEFINED _VERSION_FULL AND NOT _VERSION_NOT_GIT_REPO)
     endif()
 endif()
 
-# ---------- Generacja nagłówka ----------
-
 function(gitversion_configure_file VERSION_H_TEMPLATE VERSION_H)
     configure_file("${VERSION_H_TEMPLATE}" "${VERSION_H}")
 endfunction()
 
-version_export_variables()  # eksportuje TE_VERSION_* itd.
+version_export_variables()
 
 if(VERSION_GENERATE_NOW)
-    # Tryb jednokrotnego odpalenia z zewnętrznymi parametrami
     gitversion_configure_file("${VERSION_H_TEMPLATE}" "${VERSION_H}")
 else()
-    # Nazwy plików oparte na prefixie, np. TEVersion.h
     set(_VERSION_H_FILENAME "${VERSION_PREFIX}Version.h")
     set(_VERSION_H_TEMPLATE "${CMAKE_CURRENT_LIST_DIR}/${_VERSION_H_FILENAME}.in")
     set(_VERSION_H         "${VERSION_OUT_DIR}/${_VERSION_H_FILENAME}")
@@ -236,8 +215,7 @@ else()
     else()
         message(CHECK_PASS "Found '${_VERSION_H_TEMPLATE}'")
     endif()
-
-    # Target generujący nagłówek
+	
 	add_custom_target(${_VERSION_TARGET_GEN}
 		ALL
 		BYPRODUCTS "${_VERSION_H}"
@@ -279,8 +257,6 @@ else()
 endif()
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)
-
-# ---------- Log końcowy ----------
 
 if(VERSION_GENERATE_NOW)
     set(_VERSION_H_GENERATED TRUE)
